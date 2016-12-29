@@ -1,1 +1,1 @@
-Learn git everyday
+Learn git everyday.
