@@ -45,15 +45,24 @@ const os = require('os');
 //     if (err) throw err;
 // });
 const server = http.createServer(function(req, res) {
-    res.writeHead(200, {
-        'Content-Type': 'text/html'
-    });
-    fs.readFile('.' + req.url, {encoding: 'utf-8'}, function(err, data) {
-        if(err) throw err;
-        res.end(data);
-    });
+    try {
+        res.writeHead(200, {
+            'Content-Type': 'text/html'
+        });
+        if (req.url === '/') {
+            fs.createReadStream(__dirname + '/index.html').pipe(res);
+        } else {
+            let stat = fs.statSync(__dirname + req.url);
+            if (stat.isFile() || stat.isDirectory()) {
+                let fileStream = fs.createReadStream(__dirname + req.url, 'utf-8');
+                fileStream.pipe(res);
+            }
+        }
+    } catch (e) {
+        console.log(e);
+    }
 });
 
 server.listen(3011, '127.0.0.1', function() {
-    console.log(server.listening?'server is listening' : 'server not listening');
+    console.log(server.listening ? 'server is listening' : 'server not listening');
 });
